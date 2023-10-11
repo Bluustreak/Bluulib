@@ -23,7 +23,7 @@ def distance2(x1,y1, x2,y2):
     dist = np.sqrt(np.power((x2-x1), 2) + np.power((y2-y1), 2))
     dx = x2-x1
     dy = y2-y1
-    return [dist, dx, dy]
+    return [dx, dy, dist]
 
 def distance2b(dx,dy):
     #returns the distance between two points in 2D space

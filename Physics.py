@@ -69,16 +69,18 @@ class World2:
 
                             p.velocityX = speed*amountx*g.sign(dist[1])
                             p.velocityY = speed*amounty*g.sign(dist[2])
+        
         if settings["nbody"]:
-            option = "UpdateAllAtOnce"
+            option = "UpdateOneAtAtime"
+
             if option == "UpdateAllAtOnce":
                 PLcopy = self.pointsList.deepcopy()
                 for p in PLcopy:
                     for other in PLcopy:
                         if p != other:
                             newVel=newVelDue2(p, other)
-                            p.velX = newVel[0]
-                            p.velY = newVel[1]
+                            p.velocityX = newVel[0]
+                            p.velocityX = newVel[1]
                 for n in range(PLcopy.length):
                     self.pointsList[n] = PLcopy[n].deepcopy()
 
@@ -86,38 +88,40 @@ class World2:
                 for p in self.pointsList:
                     for other in self.pointsList:
                         if p != other:
-                            newVel=newVelDue2(p, other)
-                            p.velX = newVel[0]
-                            p.velY = newVel[1]
+                            newVel=newVelDue2(p, other, ts)
+                            p.velocityX = newVel[0]
+                            p.velocityY = newVel[1]
             
         #this runs at the end regardless of which you choose, since al lthe functions only update the velocity
         for p in self.pointsList:
-            p.x += p.velocityX * ts
-            p.y += p.velocityY * ts
+            dispX = p.velocityX * ts
+            dispY = p.velocityY * ts
+            p.x += dispX
+            p.y += dispY
 
         
 
 
 
 def forceDue2(p:PointMass2, other:PointMass2):
-    d = g.distance2D(p, other)
-    resForce = (G * p.mass * other.mass)/g.distance2D(p, other)**2
+    dist = g.distance2(p.x, p.y, other.x, other.y)
+    resForce = (G * p.mass * other.mass)/dist[2]**2
     return resForce
+
 
 def accDue2(p:PointMass2, other:PointMass2):
     f=forceDue2(p, other)
-    distXY=g.distance2XY(p, other)
-    dist=g.distance2(p, other)
+    dist=g.distance2(p.x, p.y, other.x, other.y)
     a=f/p.mass
-    ax=a*(distXY[0]/dist)
-    ay=a*(distXY[1]/dist)
+    ax=a*(dist[0]/dist[2])
+    ay=a*(dist[1]/dist[2])
     return [ax, ay, a]
 
 def newVelDue2(p:PointMass2, other:PointMass2, ts):
     accXYC = accDue2(p, other)
     velX = accXYC[0]*ts
     velY = accXYC[1]*ts
-    return [velX, velY]
+    return [p.velocityX+velX, p.velocityY+velY]
 
 def dispDue2(p:PointMass2, other:PointMass2, ts):
     acc=accDue2(p, other)

@@ -13,7 +13,7 @@ def refreshWindow(simWin):
     col = (20,20,20)
     pygame.display.flip()
     simWin.fill(col)
-
+iterations = 0
 def RUNSIM2(world:World2, settings):
     window=pygame.display.set_mode([settings["width"], settings["height"]])
     # the game loop
@@ -38,7 +38,10 @@ def RUNSIM2(world:World2, settings):
             drawCircle(p.x, p.y, p.radius, (200,200,200), window)
         world.update(settings)
         refreshWindow(window)
-
+        
+        #iterations += 1
+        #print(iterations)
+        
         #/sim goes here
 
     pygame.quit()
