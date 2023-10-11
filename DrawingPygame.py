@@ -1,4 +1,7 @@
 
+#separate DrawingPygame and DrawingPyplot from the other modules later, to package those without any external dependencies
+
+
 import pygame
 from Physics import PointMass2, PointMass3, World2
 pygame.init()

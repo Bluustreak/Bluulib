@@ -69,8 +69,28 @@ class World2:
 
                             p.velocityX = speed*amountx*g.sign(dist[1])
                             p.velocityY = speed*amounty*g.sign(dist[2])
+        if settings["nbody"]:
+            option = "UpdateAllAtOnce"
+            if option == "UpdateAllAtOnce":
+                PLcopy = self.pointsList.deepcopy()
+                for p in PLcopy:
+                    for other in PLcopy:
+                        if p != other:
+                            newVel=newVelDue2(p, other)
+                            p.velX = newVel[0]
+                            p.velY = newVel[1]
+                for n in range(PLcopy.length):
+                    self.pointsList[n] = PLcopy[n].deepcopy()
 
-        
+            if option == "UpdateOneAtAtime":
+                for p in self.pointsList:
+                    for other in self.pointsList:
+                        if p != other:
+                            newVel=newVelDue2(p, other)
+                            p.velX = newVel[0]
+                            p.velY = newVel[1]
+            
+        #this runs at the end regardless of which you choose, since al lthe functions only update the velocity
         for p in self.pointsList:
             p.x += p.velocityX * ts
             p.y += p.velocityY * ts
@@ -92,6 +112,12 @@ def accDue2(p:PointMass2, other:PointMass2):
     ax=a*(distXY[0]/dist)
     ay=a*(distXY[1]/dist)
     return [ax, ay, a]
+
+def newVelDue2(p:PointMass2, other:PointMass2, ts):
+    accXYC = accDue2(p, other)
+    velX = accXYC[0]*ts
+    velY = accXYC[1]*ts
+    return [velX, velY]
 
 def dispDue2(p:PointMass2, other:PointMass2, ts):
     acc=accDue2(p, other)
