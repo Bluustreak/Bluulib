@@ -1,0 +1,15 @@
+class triangle:
+    def __init__(self, p1, p2, p3):
+        self.x1, self.y1 = p1.x, p1.y
+        self.x2, self.y2 = p2.x, p2.y
+        self.x3, self.y3 = p3.x, p3.y
+    def area(self):
+        pass
+
+class circle:
+    def __init__(self, r):
+        self.r = r
+    def area(self):
+        return np.power(self.r,2)*np.pi
+    def circumference(self):
+        return self.r * np.pi
