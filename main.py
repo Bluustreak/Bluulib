@@ -2,25 +2,29 @@
 from Physics import PointMass2, World2
 import DrawingPygame
 
-settings={"timestep":1e4, 
-          "width":800, 
-          "height":500, 
+settings={"timestep":1e6/10, 
+          "width":550, 
+          "height":550, 
           "nbody":True,
-          "verticalGravity":False,
-          "bodyCollissions":False,
+          "verticalGravity":True,
+          "bodyCollissions":True,
           "screenCollissions":True}
-
-print(settings["height"])
-
 li = []
-li.append(PointMass2(1, 50, 50, 3, 0, 0))
-li.append(PointMass2(1, 100, 150, 3, 0, 0))
-li.append(PointMass2(1, 200, 200, 3, 0, 0))
-li.append(PointMass2(1, 50, 200, 3, 0, 0))
-li.append(PointMass2(1, 350, 50, 3, 0, 0))
-li.append(PointMass2(1, 310, 150, 3, 0, 0))
-li.append(PointMass2(1, 320, 200, 3, 0, 0))
-li.append(PointMass2(1, 350, 200, 3, 0, 0))
+if True:
+    li.append(PointMass2(2, 50, 52, 4, 0, 0))
+    li.append(PointMass2(2, 100, 51, 4, 0, 0))
+    li.append(PointMass2(4, 200, 202, 8, 0.000001, 0.000001))
+    li.append(PointMass2(4, 50, 205, 8, 0, 0))
+    li.append(PointMass2(6, 350, 52,12, 0, 0))
+    li.append(PointMass2(6, 310, 155, 12, 0, 0))
+    li.append(PointMass2(10, 320, 202, 20, 0.00001, 0))
+
+if False:
+    for n in range(7):
+        for m in range(5):
+            li.append(PointMass2(1, n*40+50, m*40+50, 5, 0, 0))
+
+
 world = World2(li)
 DrawingPygame.RUNSIM2(world, settings)
 
