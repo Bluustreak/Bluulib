@@ -1,1 +1,3 @@
-This is a library for various geometry functions and physics functions, somewhat focused on making Nbody simulations
+This is a library for various geometry functions and physics functions, somewhat focused on making Nbody simulations.
+
+The modules DrawingPygame and DrawingPyplot will be separated into their own modules later, to be able to use the Bluulib as a pure math,geometry and physics module later, with few if any dependencies
