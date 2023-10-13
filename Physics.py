@@ -8,7 +8,6 @@ class PointMass2():
     def __init__(self, mass, x, y, velocityX, velocityY):
         self.x = x
         self.y = y
-        self.radius = math.pow(mass*4/3*math.pi, 1/3)
         self.mass = mass
         self.velocityX = velocityX
         self.velocityY = velocityY
@@ -16,13 +15,14 @@ class PointMass2():
         self.prevY = y
         self.nextX = x
         self.nextY = y
+        self.color = (200, 200, 200)
 
     def getVelocity(self):
         v = g.distance2(0, 0, self.velocityX, self.velocityY)
         return v
 
     def getRadius(self):
-        return math.pow(self.mass*4/3*math.pi, 1/3)
+        return math.pow(self.mass*4/3*math.pi, 1/2)
 
 
 class PointMass3(g.Point3):
@@ -83,7 +83,7 @@ class World2:
                             p.getRadius() + other.getRadius())
                         if collission:
                             # dist[2]**2 potentially
-                            repAcc = -(G*p.mass*other.mass)/(dist[2]) / p.mass
+                            repAcc = -(G*p.mass*other.mass) / (dist[2]**1.8) / p.mass
                             p.velocityX += repAcc*(dist[0]/dist[2])*ts
                             p.velocityY += repAcc*(dist[1]/dist[2])*ts
 
@@ -99,6 +99,7 @@ class World2:
                             p.velocityX = resvx*(p.mass/(p.mass+other.mass))
                             p.velocityY = resvy*(p.mass/(p.mass+other.mass))
                             self.pointsList.remove(other)
+                            print("merge uwu")
 
         if settings["nbody"]:
             for p in self.pointsList:
@@ -110,13 +111,13 @@ class World2:
 
         # this runs at the end regardless of which you choose, since al lthe functions only update the velocity
         for p in self.pointsList:
-            Cd = 10000
+            Cd = 100
             speedX = abs(p.velocityX)
             speedY = abs(p.velocityY)
             dragX = (Cd*speedX**2/2)*g.sign(p.velocityX)
             dragY = (Cd*speedY**2/2)*g.sign(p.velocityY)
-            p.velocityX -= dragX
-            p.velocityY -= dragY
+            p.velocityX -= dragX*0
+            p.velocityY -= dragY*0
             p.x += p.velocityX * ts
             p.y += p.velocityY * ts
 

@@ -1,5 +1,5 @@
 
-#separate DrawingPygame and DrawingPyplot from the other modules later, to package those without any external dependencies
+# separate DrawingPygame and DrawingPyplot from the other modules later, to package those without any external dependencies
 
 
 import pygame
@@ -7,43 +7,47 @@ from Physics import PointMass2, PointMass3, World2
 import math
 pygame.init()
 
-def drawCircle(x,y, r, col, simWin):
-    pygame.draw.circle(simWin, col, (x,y), r)
-    
+
+def drawCircle(x, y, r, col, simWin):
+    pygame.draw.circle(simWin, col, (x, y), r)
+
+
 def refreshWindow(simWin):
-    col = (20,20,20)
+    col = (20, 20, 20)
     pygame.display.flip()
     simWin.fill(col)
+
+
 iterations = 0
-def RUNSIM2(world:World2, settings):
-    window=pygame.display.set_mode([settings["width"], settings["height"]])
+
+
+def RUNSIM2(world: World2, settings):
+    window = pygame.display.set_mode([settings["width"], settings["height"]])
     # the game loop
     running = True
     while running:
         for event in pygame.event.get():
-            #all simulation events and keyboard inputs goes here
+            # all simulation events and keyboard inputs goes here
 
-            if(event.type == pygame.QUIT):
-                #this triggers the X on the window
+            if (event.type == pygame.QUIT):
+                # this triggers the X on the window
                 running = False
 
-            elif(event.type == pygame.KEYDOWN):
-                #keypresses goes here
+            elif (event.type == pygame.KEYDOWN):
+                # keypresses goes here
                 if pygame.K_q:
                     running = False
 
-
-        #sim goes here
+        # sim goes here
 
         for p in world.pointsList:
-            drawCircle(p.x, p.y, math.pow(p.mass*4/3*math.pi, 1/3), (200,200,200), window)
+            drawCircle(p.x, p.y, p.getRadius(), p.color, window)
         world.update(settings)
         refreshWindow(window)
-        
-        #iterations += 1
-        #print(iterations)
-        
-        #/sim goes here
+
+        # iterations += 1
+        # print(iterations)
+
+        # /sim goes here
 
     pygame.quit()
-
