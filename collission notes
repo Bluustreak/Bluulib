@@ -1,0 +1,101 @@
+
+
+                            option = 5
+                            if option == 1:
+                                speedThis = p.getVelocity()
+                                speedOther = other.getVelocity()
+                                dvx=speedOther[1]-speedThis[1]
+                                dvy=speedOther[2]-speedThis[2]
+                                relativeSpeed = g.distance2b(dvx, dvy)
+
+                                collissionEnergy = relativeSpeed*p.mass/2
+
+                                angleOfContact = math.atan2(other.x-p.x, other.y-p.y)*(180/3.14156)-90
+                                angleOfDirection = math.atan2(p.velocityX, p.velocityY)*(180/3.14156)
+
+                                newAngleOfDirection = angleOfContact-angleOfDirection
+                                newXspeed = math.cos(newAngleOfDirection)*(collissionEnergy/p.mass)
+                                newYspeed = math.sin(newAngleOfDirection)*(collissionEnergy/p.mass)
+                                p.velocityX = newXspeed
+                                p.velocityY = newYspeed
+                            elif option == 2:
+                                dist = g.distance2(p.x, p.y, other.x, other.y)
+                                f = (G*p.mass*other.mass) / (dist[2])*-1
+                                accx = f/p.mass*(dist[0]/dist[2])
+                                accy = f/p.mass*(dist[1]/dist[2])
+                                p.velocityX *= velScalarX
+                                p.velocityY *= velScalarY
+                                p.velocityX += accx*ts
+                                p.velocityY += accy*ts
+                            elif option == 3:
+                                p.x = p.prevX
+                                p.y = p.prevY
+                                speedThis = p.getVelocity()
+                                speedOther = other.getVelocity()
+                                dvx=speedThis[0]-speedOther[0]
+                                dvy=speedThis[1]-speedOther[1]
+                                relativeSpeed = g.distance2b(dvx, dvy)
+                                velScalarX = (1-bounceEnergyLoss*(dvx/relativeSpeed))
+                                velScalarY = (1-bounceEnergyLoss*(dvy/relativeSpeed))
+                                dist = g.distance2(p.x, p.y, other.x, other.y)
+                                dx = (dist[0]/dist[2])
+                                dy = (dist[1]/dist[2])
+                                p.velocityX = -p.velocityX*dx/2
+                                p.velocityY = -p.velocityY*dy/2
+                                other.velocityX = -p.velocityX*dx/2
+                                other.velocityY = -p.velocityY*dy/2
+                                while collission:
+                                    p.x += p.velocityX * ts*10
+                                    p.y += p.velocityY * ts*10
+                                    other.x += other.velocityX * ts
+                                    other.y += other.velocityY * ts
+                                    dist = g.distance2(p.x, p.y, other.x, other.y)
+                                    collission = dist[2] < (p.radius + other.radius)
+                            elif option == 4:
+                                
+
+                                RadToDeg = (180/3.1415)
+                                DegToRad = (3.1415/180)
+
+                                #get their position difference                                
+                                dist = g.distance2(p.x, p.y, other.x, other.y)
+                                dx = dist[0]
+                                dy = dist[1]
+                                
+                                #they collide against a line tangent to their collission point, where the line angle is
+                                collissionLineAngle = math.asin(dy/dist[2])*RadToDeg-90 # +90 or -90? dunno
+
+                            #then get the current and other, and the speed difference between them, 
+                                #to later calculate the bounce direction
+                                pVel = g.distance2(0,0, p.velocityX, p.velocityY) 
+                                otherVel = g.distance2(0,0, other.velocityX, other.velocityY) 
+                                relX = pVel[0]-otherVel[0]
+                                relY = pVel[1]-otherVel[1]
+                                relativeSpeed = g.distance2b(relX, relY)
+                                colEnergy = p.mass*other.mass*relativeSpeed**2/2
+                            #calc new vel for p and other, proportioned out to keep energy
+                                #the particle movement angle is
+                                pVelocityAngle = math.asin(pVel[1]/pVel[2])*RadToDeg
+                                #the resulting bounce direction is:
+                                reboundAngle = (collissionLineAngle-pVelocityAngle)*2
+                                
+                                p.velocityX *= math.cos(reboundAngle*DegToRad)
+                                p.velocityY *= math.sin(reboundAngle*DegToRad)
+                                other.velocityX = p.velocityX*math.cos(reboundAngle*DegToRad)
+                                other.velocityY = p.velocityX*math.sin(reboundAngle*DegToRad)
+                                #(colEnergy/(p.mass)*(p.mass+other.mass))
+
+
+
+                                #aftering calulating the direction, move them out of eachother so they don't cause clipping errors
+                                p.x = p.prevX
+                                p.y = p.prevY
+                            elif option == 5:
+                                dx=dist[0]
+                                dy=dist[1]
+                                p.velocityX+=(dx/dist[2])*-g.sign(dx)
+                                p.velocityY+=(dy/dist[2])*-g.sign(dy)
+                                other.velocityX*=(dx/dist[2])
+                                other.velocityY*=(dy/dist[2])
+                                p.x = p.prevX
+                                p.y = p.prevY

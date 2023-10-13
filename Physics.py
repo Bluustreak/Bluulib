@@ -4,18 +4,22 @@ import math
 G=6.67*10**-11
 
 class PointMass2():
-    def __init__(self, mass, x, y, radius, velocityX, velocityY):
+    def __init__(self, mass, x, y, velocityX, velocityY):
         self.x = x 
         self.y = y 
-        self.radius = radius
+        self.radius = math.pow(mass*4/3*math.pi, 1/3)
         self.mass = mass
         self.velocityX = velocityX
         self.velocityY = velocityY
-        self.prevX
-        self.prevY
+        self.prevX = x
+        self.prevY = y
+        self.nextX = x
+        self.nextY = y
     def getVelocity(self):
         v = g.distance2(0,0, self.velocityX, self.velocityY)
         return v
+    def getRadius(self):
+        return math.pow(self.mass*4/3*math.pi, 1/3)
     
 class PointMass3(g.Point3):
     #inherits position
@@ -30,7 +34,7 @@ class PointMass3(g.Point3):
         return v
     
 class World2:
-    def __init__(self, lop):
+    def __init__(self, lop:list()):
         self.pointsList = lop
         self.collissions = 0
     def totalEnergy(self):
@@ -48,122 +52,67 @@ class World2:
         if settings["screenCollissions"]:
             bounceEnergyLoss = 0.1
             for p in self.pointsList:
-                if p.y-p.radius < 0:
-                    p.y=0+p.radius
-                    p.velocityY*=-(1-bounceEnergyLoss)
-                elif p.y+p.radius > H:
-                    p.y=H-p.radius
-                    p.velocityY*=-(1-bounceEnergyLoss)
-                if p.x-p.radius < 0:
-                    p.x=0+p.radius
-                    p.velocityX*=-(1-bounceEnergyLoss)
-                elif p.x+p.radius > W:
-                    p.x=W-p.radius
-                    p.velocityX*=-(1-bounceEnergyLoss)
+                if p.y-p.getRadius() < 0:
+                    p.y=0+p.getRadius()
+                    #p.velocityY*=-(1-bounceEnergyLoss)
+                elif p.y+p.getRadius() > H:
+                    p.y=H-p.getRadius()
+                    #p.velocityY*=-(1-bounceEnergyLoss)
+                if p.x-p.getRadius() < 0:
+                    p.x=0+p.getRadius()
+                    #p.velocityX*=-(1-bounceEnergyLoss)
+                elif p.x+p.getRadius() > W:
+                    p.x=W-p.getRadius()
+                    #p.velocityX*=-(1-bounceEnergyLoss)
 
         if settings["bodyCollissions"]:
-            bounceEnergyLoss = 0.2
             for p in self.pointsList:
                 for other in self.pointsList:
                     if p != other:
                         dist = g.distance2(p.x, p.y, other.x, other.y)
-                        collission = dist[2] < (p.radius + other.radius)
+                        collission = dist[2] < (p.getRadius() + other.getRadius())
                         if collission:
-                            p.x = p.prevX
-                            p.y = p.prevY
-                            speedThis = p.getVelocity()
-                            speedOther = other.getVelocity()
-                            dvx=speedThis[0]-speedOther[0]
-                            dvy=speedThis[1]-speedOther[1]
-                            relativeSpeed = g.distance2b(dvx, dvy)
-                            velScalarX = (1-bounceEnergyLoss*(dvx/relativeSpeed))
-                            velScalarY = (1-bounceEnergyLoss*(dvy/relativeSpeed))
+                            repAcc = -(G*p.mass*other.mass)/(dist[2]) / p.mass #dist[2]**2 potentially
+                            p.velocityX += repAcc*(dist[0]/dist[2])*ts
+                            p.velocityY += repAcc*(dist[1]/dist[2])*ts
 
-                            option = 2
-                            if option == 1:
-                                speedThis = p.getVelocity()
-                                speedOther = other.getVelocity()
-                                dvx=speedOther[1]-speedThis[1]
-                                dvy=speedOther[2]-speedThis[2]
-                                relativeSpeed = g.distance2b(dvx, dvy)
-
-                                collissionEnergy = relativeSpeed*p.mass/2
-
-                                angleOfContact = math.atan2(other.x-p.x, other.y-p.y)*(180/3.14156)-90
-                                angleOfDirection = math.atan2(p.velocityX, p.velocityY)*(180/3.14156)
-
-                                newAngleOfDirection = angleOfContact-angleOfDirection
-                                newXspeed = math.cos(newAngleOfDirection)*(collissionEnergy/p.mass)
-                                newYspeed = math.sin(newAngleOfDirection)*(collissionEnergy/p.mass)
-                                p.velocityX = newXspeed
-                                p.velocityY = newYspeed
-                            elif option == 2:
-                                dist = g.distance2(p.x, p.y, other.x, other.y)
-                                f = (G*p.mass*other.mass) / (dist[2])*-1
-                                accx = f/p.mass*(dist[0]/dist[2])
-                                accy = f/p.mass*(dist[1]/dist[2])
-                                p.velocityX *= velScalarX
-                                p.velocityY *= velScalarY
-                                p.velocityX += accx*ts
-                                p.velocityY += accy*ts
-                                
-
-                            elif option == 3:
-                                dist = g.distance2(p.x, p.y, other.x, other.y)
-                                dx = (dist[0]/dist[2])
-                                dy = (dist[1]/dist[2])
-                                p.velocityX = -p.velocityX*dx/2
-                                p.velocityY = -p.velocityY*dy/2
-                                other.velocityX = -p.velocityX*dx/2
-                                other.velocityY = -p.velocityY*dy/2
-                                while collission:
-                                    p.x += p.velocityX * ts*10
-                                    p.y += p.velocityY * ts*10
-                                    other.x += other.velocityX * ts
-                                    other.y += other.velocityY * ts
-                                    dist = g.distance2(p.x, p.y, other.x, other.y)
-                                    collission = dist[2] < (p.radius + other.radius)
-                                
-
-
+        if settings["merging"]:
+            for p in self.pointsList:
+                for other in self.pointsList:
+                    if p != other:
+                        dist = g.distance2(p.x, p.y, other.x, other.y)
+                        if dist[2]< p.getRadius():
+                            p.mass += other.mass
+                            resvx=p.velocityX + other.velocityX
+                            resvy=p.velocityY + other.velocityY
+                            p.velocityX = resvx*(p.mass/(p.mass+other.mass))
+                            p.velocityY = resvy*(p.mass/(p.mass+other.mass))
+                            self.pointsList.remove(other)
                             
-                            #amountx = dist[0]/dist[2]
-                            #amounty = dist[1]/dist[2]
-                            #p.velocityX -= (collissionEnergy*amountx)/p.mass
-                            #p.velocityY -= (collissionEnergy*amounty)/p.mass
-                            #other.velocityX += (collissionEnergy*amountx)/other.mass
-                            #other.velocityY += (collissionEnergy*amounty)/other.mass
-                            #p.velocityX*=-amountx
-                            #p.velocityY*=-amounty
-                            #other.velocityX*=-amountx
-                            #other.velocityY*=-amounty
-        
+                            
+
+
+
+
+
+
         if settings["nbody"]:
-            option = "UpdateOneAtAtime"
+            for p in self.pointsList:
+                for other in self.pointsList:
+                    if p != other:
+                        newVel=newVelDue2(p, other, ts)
+                        p.velocityX = newVel[0]
+                        p.velocityY = newVel[1]
+        
+        
 
-            if option == "UpdateAllAtOnce":
-                PLcopy = self.pointsList.deepcopy()
-                for p in PLcopy:
-                    for other in PLcopy:
-                        if p != other:
-                            newVel=newVelDue2(p, other)
-                            p.velocityX = newVel[0]
-                            p.velocityX = newVel[1]
-                for n in range(PLcopy.length):
-                    self.pointsList[n] = PLcopy[n].deepcopy()
 
-            if option == "UpdateOneAtAtime":
-                for p in self.pointsList:
-                    for other in self.pointsList:
-                        if p != other:
-                            newVel=newVelDue2(p, other, ts)
-                            p.velocityX = newVel[0]
-                            p.velocityY = newVel[1]
-            
+        
         #this runs at the end regardless of which you choose, since al lthe functions only update the velocity
         for p in self.pointsList:
-            p.prevX = p.x
-            p.prevY = p.y
+            Cd = 1000
+            p.velocityX = p.velocityX*0.99
+            p.velocityY = p.velocityY*0.99
             p.x += p.velocityX * ts
             p.y += p.velocityY * ts
 

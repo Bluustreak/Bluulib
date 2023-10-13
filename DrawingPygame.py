@@ -4,6 +4,7 @@
 
 import pygame
 from Physics import PointMass2, PointMass3, World2
+import math
 pygame.init()
 
 def drawCircle(x,y, r, col, simWin):
@@ -35,7 +36,7 @@ def RUNSIM2(world:World2, settings):
         #sim goes here
 
         for p in world.pointsList:
-            drawCircle(p.x, p.y, p.radius, (200,200,200), window)
+            drawCircle(p.x, p.y, math.pow(p.mass*4/3*math.pi, 1/3), (200,200,200), window)
         world.update(settings)
         refreshWindow(window)
         

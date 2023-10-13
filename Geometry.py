@@ -15,19 +15,20 @@ class Point3:
         self.y = y
         self.z = z
 
-
+radToDeg = 180/math.pi
+degToRad = math.pi/180
 #various flavours of getting the 2D hypothenuse:
 
 def distance2(x1,y1, x2,y2):
     #returns the distance between two points in 2D space
-    dist = np.sqrt(np.power((x2-x1), 2) + np.power((y2-y1), 2))
+    dist = math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1), 2))
     dx = x2-x1
     dy = y2-y1
     return [dx, dy, dist]
 
 def distance2b(dx,dy):
     #returns the distance between two points in 2D space
-    dist = np.sqrt(np.power(dx, 2) + np.power(dy, 2))
+    dist = math.sqrt(math.pow(dx, 2) + math.pow(dy, 2))
     return dist
 
 def distance2XY(p1, p2):
@@ -39,7 +40,7 @@ def distance2XY(p1, p2):
 
 #returns the distance between two points in 3D space
 def distance3(x1, y1, z1, x2, y2, z2):
-    return np.sqrt(np.power((x2-x1), 2) + np.power((y2-y1), 2) + np.power((z2-z1), 2))
+    return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1), 2) + math.pow((z2-z1), 2))
 
 #returns the x, y, z components of positonal difference
 def distance3XY(x1, y1, z1, x2, y2, z2):
@@ -77,7 +78,7 @@ def triangleAreaHeron(p1, p2, p3):
     b=distance2(p2.x, p2.y, p3.x, p3.y)
     c=distance2(p3.x, p3.y, p1.x, p1.y)
     s=(a+b+c)/2
-    A=np.sqrt(s*(s-a)*(s-b)*(s-c))
+    A=math.sqrt(s*(s-a)*(s-b)*(s-c))
     return A
 
 def triangleAreaBluu(p1, p2, p3):
