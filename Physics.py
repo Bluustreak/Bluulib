@@ -1,5 +1,5 @@
 import Geometry as g
-import math
+import math, time
 
 G = 6.67*10**-11
 
@@ -100,15 +100,16 @@ class World2:
                             p.velocityY = resvy*(p.mass/(p.mass+other.mass))
                             self.pointsList.remove(other)
                             print("merge uwu")
-
+        t1 = time.time()
         if settings["nbody"]:
             for p in self.pointsList:
                 for other in self.pointsList:
                     if p != other:
-                        newVel = newVelDue2(p, other, ts)
+                        #newVel = newVelDue2(p, other, ts)
+                        newVel = newVelDueOther2(p, other, ts)
                         p.velocityX = newVel[0]
                         p.velocityY = newVel[1]
-
+        timetaken = time.time()-t1
         # this runs at the end regardless of which you choose, since al lthe functions only update the velocity
         for p in self.pointsList:
             Cd = 100
@@ -143,6 +144,17 @@ def newVelDue2(p: PointMass2, other: PointMass2, ts):
     velY = accXYC[1]*ts
     return [p.velocityX+velX, p.velocityY+velY]
 
+def newVelDueOther2(p: PointMass2, other: PointMass2, ts):
+    #this is a summary of the other functions into one, to avoid duplicated calculations
+    dist = g.distance2(p.x, p.y, other.x, other.y)
+    resForce = (G * p.mass * other.mass)/dist[2]**2
+    a = resForce/p.mass
+    ax = a*(dist[0]/dist[2])
+    ay = a*(dist[1]/dist[2])
+    
+    velX = ax*ts
+    velY = ay*ts
+    return [p.velocityX+velX, p.velocityY+velY]
 
 def dispDue2(p: PointMass2, other: PointMass2, ts):
     acc = accDue2(p, other)
